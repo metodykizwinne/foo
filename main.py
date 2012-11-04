@@ -3,8 +3,6 @@
 from Tkinter import *
 
 class App:
-
-
     
     def __init__(self, master):
 
@@ -20,22 +18,11 @@ class App:
         self.passwordLabel.pack()
         self.password = Entry(frame, show="*")
         self.password.pack()
-        
-        
-
-        
-
-
 
         self.button = Button(frame, text="Zaloguj", fg="red", command=check_password)
         self.button.pack()
 
-
-    def say_hi(self):
-        print "hi there, everyone!"
-
+    
 root = Tk()
-
 app = App(root)
-
 root.mainloop()
