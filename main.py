@@ -19,7 +19,7 @@ class App:
         self.password = Entry(frame, show="*")
         self.password.pack()
 
-        self.button = Button(frame, text="Zaloguj", fg="red", command=check_password)
+        self.button = Button(frame, text="Zaloguj", fg="red")
         self.button.pack()
 
     
