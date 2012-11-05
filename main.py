@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from Tkinter import *
+import tkMessageBox
+import psycopg2
 
-class App:
+HOST='metodyki.dyndns.org'
+DBNAME='pgdatabase'
+
+class LoginWindow:
     
     def __init__(self, master):
 
@@ -19,10 +24,20 @@ class App:
         self.password = Entry(frame, show="*")
         self.password.pack()
 
-        self.button = Button(frame, text="Zaloguj", fg="red")
+        self.button = Button(frame, text="Zaloguj", fg="red", command=self.check_password)
         self.button.pack()
 
-    
-root = Tk()
-app = App(root)
-root.mainloop()
+        self.password.bind('<Return>', self.check_password)
+
+    def check_password(self, event=None):
+        try:
+            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, self.login.get(), HOST, self.password.get()))
+        except:
+            tkMessageBox.showinfo("Błąd logowania", "Złe hasło/login!")
+        
+def main():    
+    root = Tk()
+    LoginWindow(root)
+    root.mainloop()
+
+main()
