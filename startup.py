@@ -15,13 +15,13 @@ class StartUpWindow:
  
     def makeButton(self,number,frame):
         self.number = Button(frame, text="Sprawa nr " + str(number), fg="red",
-        command = lambda: self.open_investiagtion(number))
+        command = lambda: self.open_investigation(number))
         self.number.pack()
  
-    def open_investiagtion(self,e):
+    def open_investigation(self,e):
         print 'Otworz okno sprawy %s.' % str(e)
  
  
-# root = Tk()
-# app = StartUpWindow(root, range(10))
-# root.mainloop()
+root = Tk()
+app = StartUpWindow(root, range(10))
+root.mainloop()
