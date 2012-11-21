@@ -4,7 +4,7 @@ import psycopg2
 import unittest
 import core
 
-class TestInvestigationEditing(unittest.TestCase):
+class InvestigationEditingTC(unittest.TestCase):
 
     def setUp(self):
         self.conn = psycopg2.connect("port=5432 host=metodyki.dyndns.org dbname=test user=pguser password='tylkosystemlinux'")
@@ -20,38 +20,49 @@ class TestInvestigationEditing(unittest.TestCase):
         "INSERT INTO uprawnienia VALUES ('S101','P101','odczyt/zapis');" + \
         "INSERT INTO uprawnienia VALUES ('S102','P100','odczyt/zapis')")
 
-    def test_set_privileges(self):
-        # opcjonalnie można potem sprawdzać całą tabelę (albo przynajmniej czy liczba rekordów się zgadza)
+    def tearDown(self):
+        self.cur.execute("DROP TABLE uprawnienia")
+
+# opcjonalnie można potem sprawdzać całą tabelę (albo przynajmniej czy liczba rekordów się zgadza)
         
-        # brak sprawy
+class NoSuchCaseTC(InvestigationEditingTC):
+    # brak sprawy
+    def runTest(self):
         with self.assertRaises(NoSuchCaseError):
             core.set_privileges('S105','P100','odczyt')
 
-        # brak użytkownika
+class NoSuchUserTC(InvestigationEditingTC):
+    # brak użytkownika
+    def runTest(self):
         with self.assertRaises(NoSuchUserError):
             core.set_privileges('S100', 'P106', 'odczyt/zapis')
 
-        # usunięcie uprawnień
+class TakeAwayPrivilegesTC(InvestigationEditingTC):            
+    # usunięcie uprawnień
+    def runTest(self):
         core.set_privileges('S100', 'P102', None)
         cur.execute("SELECT NULL FROM uprawnienia WHERE Sprawa='S100' AND Policjant='P102'")
         self.assertEqual(cur.rowcount, 0)
 
-        # zmiana uprawnień
+class ChangePrivilegesTC(InvestigationEditingTC):
+    # zmiana uprawnień
+    def runTest(self):
         core.set_privileges('S101', 'P100', 'odczyt/zapis')
         cur.execute("SELECT Uprawnienia FROM uprawnienia WHERE Sprawa='S101' AND Policjant='P100'")
         self.assertEqual(cur.rowcount, 1)
         (privileges,) = cur.fetchone()
         self.assertEqual(privileges, 'odczyt/zapis')
 
-        # dodanie uprawnień do sprawy nowemu użytkownikowi
+class GivePrivilegesTC(InvestigationEditingTC):        
+    # dodanie uprawnień do sprawy nowemu użytkownikowi
+    def runTest(self):
         core.set_privileges('S101', 'P105', 'odczyt')
         cur.execute("SELECT Uprawnienia FROM uprawnienia WHERE Sprawa='S101' AND Policjant='P105'")
         self.assertEqual(cur.rowcount, 1)
         (privileges,) = cur.fetchone()
         self.assertEqual(privileges, 'odczyt')
 
-    def tearDown(self):
-        self.cur.execute("DROP TABLE uprawnienia")
 
-suite = unittest.TestLoader().loadTestsFromTestCase(TestSequenceFunctions)
-unittest.TextTestRunner(verbosity=2).run(suite)
+
+# suite = unittest.TestLoader().loadTestsFromTestCase(TestSequenceFunctions)
+# unittest.TextTestRunner(verbosity=2).run(suite)
