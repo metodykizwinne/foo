@@ -27,10 +27,12 @@ class TestInvestigationEditing(unittest.TestCase):
 
         with self.assertRaises(NoSuchUserError):
             core.set_privileges('S100', 'P106', 'odczyt/zapis')
-# powinna być jeszcze przynajmniej zmiana uprawnień i usunięcie rekordu poprzez ich odebranie
+# powinna być jeszcze przynajmniej zmiana uprawnień
 # + opcjonalnie można potem sprawdzać całą tabelę albo przynajmniej czy liczba rekordów się zgadza
 
         core.set_privileges('S100', 'P102', None)
+        cur.execute("SELECT * FROM uprawnienia WHERE Sprawa='S100' AND Policjant='P102'")
+        self.assertEqual(cur.rowcount, 0)
 
 
     def tearDown(self):
