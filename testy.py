@@ -3,21 +3,22 @@
 import psycopg2
 import unittest
 
-class TestSequenceFunctions(unittest.TestCase):
+class TestInvestigationEditing(unittest.TestCase):
 
     def setUp(self):
         self.conn = psycopg2.connect("port=5432 host=metodyki.dynds.org dbname=test user=pguser password='tylkosystemlinux'")
         self.cur = conn.cursor()
-        self.cur.execute("INSERTO INTO uprawnienia ('P100','S100','odczyt');")
-        self.cur.execute("INSERTO INTO uprawnienia ('P101','S100','odczyt');")
-        self.cur.execute("INSERTO INTO uprawnienia ('P102','S100','odczyt/zapis');")
-        self.cur.execute("INSERTO INTO uprawnienia ('P103','S100','odczyt');")
-        self.cur.execute("INSERTO INTO uprawnienia ('P104','S100','odczyt');")
-        self.cur.execute("INSERTO INTO uprawnienia ('P100','S101','odczyt');")
-        self.cur.execute("INSERTO INTO uprawnienia ('P101','S101','odczyt/zapis');")
-        self.cur.execute("INSERTO INTO uprawnienia ('P102','S100','odczyt');")
-        self.cur.execute("INSERTO INTO uprawnienia ('P105','S100','odczyt');")
-        self.scur.execute("INSERTO INTO uprawnienia ('P100','S102','odczyt/zapis');")
+        self.cur.execute("CREATE TABLE uprawnienia ( U_Id int, Policjant varchar(255), Sprawa varchar(255), Uprawnienia varchar(255) );" + \
+        "INSERT INTO uprawnienia ('P100','S100','odczyt');" + \
+        "INSERT INTO uprawnienia ('P101','S100','odczyt');" + \
+        "INSERT INTO uprawnienia ('P102','S100','odczyt/zapis');" + \
+        "INSERT INTO uprawnienia ('P103','S100','odczyt');" + \
+        "INSERT INTO uprawnienia ('P104','S100','odczyt');" + \
+        "INSERT INTO uprawnienia ('P100','S101','odczyt');" + \
+        "INSERT INTO uprawnienia ('P101','S101','odczyt/zapis');" + \
+        "INSERT INTO uprawnienia ('P102','S100','odczyt');" + \
+        "INSERT INTO uprawnienia ('P105','S100','odczyt');" + \
+        "INSERT INTO uprawnienia ('P100','S102','odczyt/zapis');")
 
     def test_set_privileges(self):
         with self.assertRaises(NoSuchCaseError):
@@ -38,16 +39,7 @@ class TestSequenceFunctions(unittest.TestCase):
             self.assertTrue(element in self.seq)
 
     def tearDown(self):
-        self.cur.execute("DELETE FROM uprawnienia WHERE uzytkownik = 'P100' AND sprawa='S100' AND typ= 'odczyt');")
-        self.cur.execute("DELETE FROM uprawnienia WHERE uzytkownik ='P101' AND sprawa='S100' AND typ='odczyt');")
-        self.cur.execute("DELETE FROM uprawnienia WHERE uzytkownik ='P102' AND sprawa='S100' AND typ='odczyt/zapis');")
-        self.cur.execute("DELETE FROM uprawnienia WHERE uzytkownik ='P103' AND sprawa='S100' AND typ='odczyt');")
-        self.cur.execute("DELETE FROM uprawnienia WHERE uzytkownik ='P104' AND sprawa='S100' AND typ='odczyt');")
-        self.cur.execute("DELETE FROM uprawnienia WHERE uzytkownik ='P100' AND sprawa='S101' AND typ='odczyt');")
-        self.cur.execute("DELETE FROM uprawnienia WHERE uzytkownik ='P101' AND sprawa='S101' AND typ='odczyt/zapis');")
-        self.cur.execute("DELETE FROM uprawnienia WHERE uzytkownik ='P102' AND sprawa='S100' AND typ='odczyt');")
-        self.cur.execute("DELETE FROM uprawnienia WHERE uzytkownik ='P105' AND sprawa='S100' AND typ='odczyt');")
-        self.scur.execute("DELETE FROM uprawnienia WHERE uzytkownik ='P100' AND sprawa='S102' AND typ='odczyt/zapis');")
+        self.cur.execute("DROP TABLE uprawnienia;")
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestSequenceFunctions)
 unittest.TextTestRunner(verbosity=2).run(suite)
