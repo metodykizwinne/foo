@@ -2,6 +2,7 @@
 
 import psycopg2
 import unittest
+import core
 
 class TestInvestigationEditing(unittest.TestCase):
 
@@ -22,10 +23,10 @@ class TestInvestigationEditing(unittest.TestCase):
 
     def test_set_privileges(self):
         with self.assertRaises(NoSuchCaseError):
-            set_privileges('S105','P100','odczyt')
+            core.set_privileges('S105','P100','odczyt')
 
         with self.assertRaises(NoSuchUserError):
-            set_privileges('S100', 'P106', 'odczyt/zapis')
+            core.set_privileges('S100', 'P106', 'odczyt/zapis')
 # powinna być jeszcze przynajmniej zmiana uprawnień i usunięcie rekordu poprzez ich odebranie
 # + opcjonalnie można potem sprawdzać całą tabelę albo przynajmniej czy liczba rekordów się zgadza
 
