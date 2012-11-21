@@ -7,12 +7,12 @@ import psycopg2
 from functools import partial
 
 import core
-from util import insert_privileges
+from util import insert_privileges, TESTDBNAME, TESTUSER, HOST, TESTPASSWORD
 
 class InvestigationEditingTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.conn = psycopg2.connect("port=5432 host=metodyki.dyndns.org dbname=test user=pguser password='tylkosystemlinux'")
+        self.conn = psycopg2.connect("dbname=%s user=%s host=%s password='%s'" % (TESTDBNAME, TESTUSER, HOST, TESTPASSWORD))
         self.cur = self.conn.cursor()
         test_privileges = [ ('S100','P100','odczyt'),
                             ('S100','P101','odczyt'),

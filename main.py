@@ -4,8 +4,7 @@ from Tkinter import *
 import tkMessageBox
 import psycopg2
 
-HOST='metodyki.dyndns.org'
-DBNAME='pgdatabase'
+from util import DBNAME, HOST
 
 class LoginWindow:
     
