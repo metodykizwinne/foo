@@ -9,7 +9,7 @@ class TestInvestigationEditing(unittest.TestCase):
     def setUp(self):
         self.conn = psycopg2.connect("port=5432 host=metodyki.dyndns.org dbname=test user=pguser password='tylkosystemlinux'")
         self.cur = conn.cursor()
-        self.cur.execute("CREATE TABLE uprawnienia ( Sprawa varchar(255), Policjant varchar(255), Uprawnienia varchar(255) );" + \
+        self.cur.execute("CREATE TABLE uprawnienia ( id serial PRIMARY KEY, Sprawa varchar(255), Policjant varchar(255), Uprawnienia varchar(255) );" + \
         "INSERT INTO uprawnienia VALUES ('S100','P100','odczyt');" + \
         "INSERT INTO uprawnienia VALUES ('S100','P101','odczyt');" + \
         "INSERT INTO uprawnienia VALUES ('S100','P102','odczyt/zapis');" + \
