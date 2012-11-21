@@ -23,20 +23,12 @@ class TestInvestigationEditing(unittest.TestCase):
     def test_set_privileges(self):
         with self.assertRaises(NoSuchCaseError):
             set_privileges('S105','P100','odczyt')
-        self.assertEqual(self.seq, range(10))
 
-        # should raise an exception for an immutable sequence
-        self.assertRaises(TypeError, random.shuffle, (1,2,3))
+        with self.assertRaises(NoSuchUserError):
+            set_privileges('S100', 'P106', 'odczyt/zapis')
+# powinna być jeszcze przynajmniej zmiana uprawnień i usunięcie rekordu poprzez ich odebranie
+# + opcjonalnie można potem sprawdzać całą tabelę albo przynajmniej czy liczba rekordów się zgadza
 
-    def test_choice(self):
-        element = random.choice(self.seq)
-        self.assertTrue(element in self.seq)
-
-    def test_sample(self):
-        with self.assertRaises(ValueError):
-            random.sample(self.seq, 20)
-        for element in random.sample(self.seq, 5):
-            self.assertTrue(element in self.seq)
 
     def tearDown(self):
         self.cur.execute("DROP TABLE uprawnienia;")
