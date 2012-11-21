@@ -1,27 +1,32 @@
 # -*- coding: utf-8 -*-
 
-import psycopg2
+# CREATE TABLE uprawnienia ( id serial PRIMARY KEY, Sprawa varchar(255), Policjant varchar(255), Uprawnienia varchar(255) )
+
 import unittest
+import psycopg2
+from functools import partial
+
 import core
+from util import insert_privileges
 
 class InvestigationEditingTestCase(unittest.TestCase):
 
     def setUp(self):
         self.conn = psycopg2.connect("port=5432 host=metodyki.dyndns.org dbname=test user=pguser password='tylkosystemlinux'")
         self.cur = self.conn.cursor()
-        self.cur.execute("CREATE TABLE uprawnienia ( id serial PRIMARY KEY, Sprawa varchar(255), Policjant varchar(255), Uprawnienia varchar(255) );" + \
-        "INSERT INTO uprawnienia (Sprawa, Policjant, Uprawnienia) VALUES ('S100','P100','odczyt');" + \
-        "INSERT INTO uprawnienia (Sprawa, Policjant, Uprawnienia) VALUES ('S100','P101','odczyt');" + \
-        "INSERT INTO uprawnienia (Sprawa, Policjant, Uprawnienia) VALUES ('S100','P102','odczyt/zapis');" + \
-        "INSERT INTO uprawnienia (Sprawa, Policjant, Uprawnienia) VALUES ('S100','P103','odczyt');" + \
-        "INSERT INTO uprawnienia (Sprawa, Policjant, Uprawnienia) VALUES ('S100','P104','odczyt');" + \
-        "INSERT INTO uprawnienia (Sprawa, Policjant, Uprawnienia) VALUES ('S100','P105','odczyt');" + \
-        "INSERT INTO uprawnienia (Sprawa, Policjant, Uprawnienia) VALUES ('S101','P100','odczyt');" + \
-        "INSERT INTO uprawnienia (Sprawa, Policjant, Uprawnienia) VALUES ('S101','P101','odczyt/zapis');" + \
-        "INSERT INTO uprawnienia (Sprawa, Policjant, Uprawnienia) VALUES ('S102','P100','odczyt/zapis')")
+        test_privileges = [ ('S100','P100','odczyt'),
+                            ('S100','P101','odczyt'),
+                            ('S100','P102','odczyt/zapis'),
+                            ('S100','P103','odczyt'),
+                            ('S100','P104','odczyt'),
+                            ('S100','P105','odczyt'),
+                            ('S101','P100','odczyt'),
+                            ('S101','P101','odczyt/zapis'),
+                            ('S102','P100','odczyt/zapis') ]
+        map(partial(insert_privileges, self.cur), test_privileges)
 
     def tearDown(self):
-        self.cur.execute("DROP TABLE uprawnienia")
+        self.cur.execute("DELETE FROM uprawnienia")
         self.cur.close()
         self.conn.close()
 
