@@ -1,3 +1,4 @@
+#!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
 # CREATE TABLE uprawnienia ( id serial PRIMARY KEY, Sprawa varchar(255), Policjant varchar(255), Uprawnienia varchar(255) )
