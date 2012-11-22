@@ -12,12 +12,10 @@ class LoginWindow:
     
     def __init__(self, master):
 
-        master.title("coś")
+        master.title("Logowanie do systemu")
         
         self.frame = ttk.Frame(master, padding="3 3 12 12")
         self.frame.grid(column=0, row=0, sticky=(N, W, E, S))
-        self.frame.columnconfigure(0, weight=1)
-        self.frame.rowconfigure(0, weight=1)
 
         ttk.Label(self.frame, text="Login:").grid(column=1, row=1, sticky=E)
         self.login = StringVar()
@@ -35,7 +33,7 @@ class LoginWindow:
         self.login_entry.focus()
         master.bind('<Return>', self.check_password)
 
-    def check_password(self):
+    def check_password(self, *args):
         try:
             conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, self.login.get(), HOST, self.password.get()))
         except:                 # host może też być nieosiągalny
