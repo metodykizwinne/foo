@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from Tkinter import *
+import ttk
 import tkMessageBox
 import psycopg2
 
@@ -11,28 +12,33 @@ class LoginWindow:
     
     def __init__(self, master):
 
-        frame = Frame(master)
-        frame.pack()
+        master.title("coś")
+        
+        self.frame = ttk.Frame(master, padding="3 3 12 12")
+        self.frame.grid(column=0, row=0, sticky=(N, W, E, S))
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.rowconfigure(0, weight=1)
 
-        self.loginLabel = Label(frame, text="Login", fg="red")
-        self.loginLabel.pack()
-        self.login = Entry(frame)
-        self.login.pack()
+        ttk.Label(self.frame, text="Login:").grid(column=1, row=1, sticky=E)
+        self.login = StringVar()
+        self.login_entry = ttk.Entry(self.frame, textvariable=self.login)
+        self.login_entry.grid(column=2, row=1, sticky=E)
 
-        self.passwordLabel = Label(frame, text="Hasło", fg="red")
-        self.passwordLabel.pack()
-        self.password = Entry(frame, show="*")
-        self.password.pack()
+        ttk.Label(self.frame, text="Hasło:").grid(column=1, row=2, sticky=E)
+        self.password = StringVar()
+        ttk.Entry(self.frame, show="*", textvariable=self.password).grid(column=2, row=2, sticky=E)
 
-        self.button = Button(frame, text="Zaloguj", fg="red", command=self.check_password)
-        self.button.pack()
+        ttk.Button(self.frame, text="Zaloguj", command=self.check_password).grid(column=2, row=3, sticky=(W, E))
 
-        self.password.bind('<Return>', self.check_password)
+        for child in self.frame.winfo_children(): child.grid_configure(padx=5, pady=5)
+        
+        self.login_entry.focus()
+        master.bind('<Return>', self.check_password)
 
-    def check_password(self, event=None):
+    def check_password(self):
         try:
             conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, self.login.get(), HOST, self.password.get()))
-        except:
+        except:                 # host może też być nieosiągalny
             tkMessageBox.showinfo("Błąd logowania", "Złe hasło/login!")
         
 def main():    
