@@ -8,7 +8,7 @@ import psycopg2
 
 from util import DBNAME, HOST
 
-class LoginWindow:
+class LoginDialog:
     
     def __init__(self, master):
 
@@ -41,7 +41,10 @@ class LoginWindow:
         
 def main():    
     root = Tk()
-    LoginWindow(root)
+    root.withdraw()
+    login_window = Toplevel(root)
+    login_window.protocol("WM_DELETE_WINDOW", root.quit)
+    LoginDialog(login_window)
     root.mainloop()
 
 main()
