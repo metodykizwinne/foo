@@ -75,11 +75,11 @@ class CaseCreationTestCase(unittest.TestCase):
     # sprawa już istnieje
     def test_CaseExists(self):
         with self.assertRaises(core.CaseExists):
-            create_case(self.conn, 'P100', 'S100')
+            core.create_case(self.conn, 'P100', 'S100')
             
     # utworzenie pustej sprawy
     def test_NewCase(self):
-        create_case(self.conn, 'P100', 'S666')
+        core.create_case(self.conn, 'P100', 'S666')
         self.cur.execute("SELECT * FROM sprawy WHERE Sprawa=S666")
         self.assertEqual(self.cur.rowcount, 1)
         (id, name, owner, creation_date, closure_date) = self.cur.fetchone()
