@@ -28,6 +28,8 @@ class DBTestCase(unittest.TestCase):
         self.cur.close()
         self.conn.close()
 
+# opcjonalnie można potem sprawdzać całą tabelę (albo przynajmniej czy liczba rekordów się zgadza)
+        
 class InvestigationEditingTestCase(DBTestCase):
 
     def setUp(self):
@@ -51,9 +53,6 @@ class InvestigationEditingTestCase(DBTestCase):
                       ('P105', 'AAA', 'BBB'),
                       ('P666', 'AAA', 'BBB')]
         self.prepareDB()
-
-
-    # opcjonalnie można potem sprawdzać całą tabelę (albo przynajmniej czy liczba rekordów się zgadza)
 
     # brak sprawy
     def test_NoSuchCase(self):
@@ -122,6 +121,7 @@ class CaseClosureTestCase(DBTestCase):
         with self.assertRaises(core.NoSuchCaseError):
             core.close_case(self.conn, 'P100', 'S101')
 
+    # pomyślne zamknięcie sprawy
     def test_CaseClosure(self):
         core.close_case(self.conn, 'P100', 'S100')
         self.cur.execute("SELECT Data_zamkniecia FROM sprawy WHERE Sprawa=%s", ('S100',))
