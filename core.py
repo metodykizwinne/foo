@@ -5,6 +5,7 @@ from util import insert_privileges
 
 class NoSuchUserError(Exception): pass
 class NoSuchCaseError(Exception): pass
+class DatabaseCorruption(Exception): pass
 
 def set_privileges(dbconn, user, investigation, privileges):
     cur = dbconn.cursor()
@@ -37,6 +38,9 @@ def set_privileges(dbconn, user, investigation, privileges):
             cur.execute("DELETE FROM uprawnienia WHERE Sprawa=%s AND Policjant=%s", (investigation, user))
         else:
             cur.execute("UPDATE uprawnienia SET Uprawnienia=%s WHERE Sprawa=%s AND Policjant=%s", (privileges, investigation, user))
+
+    else:
+        raise DatabaseCorruption
 
 class CaseExists(Exception): pass
                               

@@ -22,9 +22,9 @@ class DBTestCase(unittest.TestCase):
         map(partial(insert_user, self.conn), self.users)
 
     def tearDown(self):
-        self.cur.execute("DELETE FROM uprawnienia")
-        self.cur.execute("DELETE FROM sprawy")
-        self.cur.execute("DELETE FROM uzytkownicy")
+        self.cur.execute( "DELETE FROM uprawnienia;" + \
+                          "DELETE FROM sprawy;" + \
+                          "DELETE FROM uzytkownicy")
         self.cur.close()
         self.conn.close()
 
