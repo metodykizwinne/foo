@@ -1,5 +1,7 @@
-#!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
+#!/usr/bin/python2.7
+
+import datetime
 
 # CREATE TABLE uprawnienia ( id serial PRIMARY KEY, Sprawa varchar(255), Policjant varchar(255), Uprawnienia varchar(255) )
 
@@ -8,14 +10,28 @@ import psycopg2
 from functools import partial
 
 import core
-from util import insert_privileges, TESTDBNAME, TESTUSER, HOST, TESTPASSWORD
+from util import *
 
-class InvestigationEditingTestCase(unittest.TestCase):
-
-    def setUp(self):
+# klasa abstrakcyjna dla testów korzystających z bazy danych
+class DBTestCase(unittest.TestCase):
+    def prepareDB(self):
         self.conn = psycopg2.connect("dbname=%s user=%s host=%s password='%s'" % (TESTDBNAME, TESTUSER, HOST, TESTPASSWORD))
         self.cur = self.conn.cursor()
-        test_privileges = [ ('S100','P100','odczyt'),
+        map(partial(insert_privileges, self.conn), self.privileges)
+        map(partial(insert_investigation, self.conn), self.cases)
+        map(partial(insert_user, self.conn), self.users)
+
+    def tearDown(self):
+        self.cur.execute("DELETE FROM uprawnienia")
+        self.cur.execute("DELETE FROM sprawy")
+        self.cur.execute("DELETE FROM uzytkownicy")
+        self.cur.close()
+        self.conn.close()
+
+class InvestigationEditingTestCase(DBTestCase):
+
+    def setUp(self):
+        self.privileges = [ ('S100','P100','odczyt'),
                             ('S100','P101','odczyt'),
                             ('S100','P102','odczyt/zapis'),
                             ('S100','P103','odczyt'),
@@ -24,12 +40,18 @@ class InvestigationEditingTestCase(unittest.TestCase):
                             ('S101','P100','odczyt'),
                             ('S101','P101','odczyt/zapis'),
                             ('S102','P100','odczyt/zapis') ]
-        map(partial(insert_privileges, self.conn), test_privileges)
+        self.cases = [('S100', 'P666', '2001-01-01', None),
+                      ('S101', 'P666', '2001-01-01', None),
+                      ('S102', 'P666', '2001-01-01', None)]
+        self.users = [('P100', 'AAA', 'BBB'),
+                      ('P101', 'AAA', 'BBB'),
+                      ('P102', 'AAA', 'BBB'),
+                      ('P103', 'AAA', 'BBB'),
+                      ('P104', 'AAA', 'BBB'),
+                      ('P105', 'AAA', 'BBB'),
+                      ('P666', 'AAA', 'BBB')]
+        self.prepareDB()
 
-    def tearDown(self):
-        self.cur.execute("DELETE FROM uprawnienia")
-        self.cur.close()
-        self.conn.close()
 
     # opcjonalnie można potem sprawdzać całą tabelę (albo przynajmniej czy liczba rekordów się zgadza)
 
@@ -65,12 +87,12 @@ class InvestigationEditingTestCase(unittest.TestCase):
         (privileges,) = self.cur.fetchone()
         self.assertEqual(privileges, 'odczyt')
 
-class CaseCreationTestCase(unittest.TestCase):
+class CaseCreationTestCase(DBTestCase):
     def setUp(self):
-        self.conn = psycopg2.connect("dbname=%s user=%s host=%s password='%s'" % (TESTDBNAME, TESTUSER, HOST, TESTPASSWORD))
-        self.cur = self.conn.cursor()
-        # wsadz sprawe S100 i policjanta P100
-        pass
+        self.privileges = []
+        self.cases = [('S100', 'P666', '2001-01-01', None)]
+        self.users = [('P100', 'AAA', 'BBB')]
+        self.prepareDB()
 
     # sprawa już istnieje
     def test_CaseExists(self):
@@ -80,20 +102,40 @@ class CaseCreationTestCase(unittest.TestCase):
     # utworzenie pustej sprawy
     def test_NewCase(self):
         core.create_case(self.conn, 'P100', 'S666')
-        self.cur.execute("SELECT * FROM sprawy WHERE Sprawa=S666")
+        self.cur.execute("SELECT * FROM sprawy WHERE Sprawa='S666'")
         self.assertEqual(self.cur.rowcount, 1)
         (id, name, owner, creation_date, closure_date) = self.cur.fetchone()
         self.assertEqual(owner, 'P100')
-        # coś tam dalej
+        now = datetime.datetime.now()
+        self.assertEqual(creation_date, datetime.date(now.year, now.month, now.day))
+        self.assertEqual(closure_date, None)
 
-    def tearDown(self):
-        self.cur.execute("DELETE FROM uprawnienia")
-        self.cur.close()
-        self.conn.close()
+class CaseClosureTestCase(DBTestCase):
+    def setUp(self):
+        self.privileges = []
+        self.cases = [('S100', 'P100', '2001-01-01', None)]
+        self.users = [('P100', 'AAA', 'BBB')]
+        self.prepareDB()
+
+    # sprawa nie istnieje
+    def test_NoSuchCase(self):
+        with self.assertRaises(core.NoSuchCaseError):
+            core.close_case(self.conn, 'P100', 'S101')
+
+    def test_CaseClosure(self):
+        core.close_case(self.conn, 'P100', 'S100')
+        self.cur.execute("SELECT Data_zamkniecia FROM sprawy WHERE Sprawa=%s", ('S100',))
+        (closure_date,) = self.cur.fetchone()
+        now = datetime.datetime.now()
+        today = datetime.date(now.year, now.month, now.day)
+        self.assertEqual(closure_date, today)
+        
+        
 
 # do wyboru
 suite = unittest.TestLoader().loadTestsFromTestCase(InvestigationEditingTestCase)
 suite = unittest.TestLoader().loadTestsFromTestCase(CaseCreationTestCase)
+suite = unittest.TestLoader().loadTestsFromTestCase(CaseClosureTestCase)
 ###########
 
 unittest.TextTestRunner(verbosity=2).run(suite)
