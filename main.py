@@ -6,6 +6,7 @@ import ttk
 import tkMessageBox
 import psycopg2
 
+import core
 from util import *
 
 root = Tk()
@@ -44,7 +45,10 @@ class LoginWindow:
 
 class CaseSelectionWindow:
     
-    def __init__(self, conn):
+    def __init__(self, conn, user):
+        self.conn = conn
+        self.user = user
+        
         self.window = Toplevel(root)
         self.window.protocol("WM_DELETE_WINDOW", root.quit)
         self.window.title("Lista spraw")
@@ -66,16 +70,23 @@ class CaseSelectionWindow:
         self.ctree.grid(column=0, row=0, rowspan=2, sticky=W)
 
         ttk.Button(self.window, text="Otwórz").grid(column=1, row=0, sticky=S)
-        ttk.Button(self.window, text="Utwórz nową sprawę").grid(column=1, row=1, sticky=N)
+        ttk.Button(self.window, text="Utwórz nową sprawę", command=self.create_case).grid(column=1, row=1, sticky=N)
 
         for child in self.window.winfo_children(): child.grid_configure(padx=5, pady=2)
         
         cur.close()
         conn.close()
+
+    def create_case(self, *args):
+        # tu wyskakuje okno z pytaniem o zawartość pola Sprawa
+
+        core.create_case(self.conn, case, self.user)
+
+        # tu wyskakuje okno edycji sprawy
         
 def main():    
     root.withdraw()
-    CaseSelectionWindow(psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, USER, HOST, PASSWORD)))
+    CaseSelectionWindow(psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, USER, HOST, PASSWORD)), 'P666')
     root.mainloop()
 
 main()
