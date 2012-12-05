@@ -22,7 +22,3 @@ def insert_investigation(dbconn, record):
 def insert_user(dbconn, record):    
     cur = dbconn.cursor()
     cur.execute("INSERT INTO uzytkownicy (Policjant, Imie, Nazwisko) VALUES (%s, %s, %s)", record)
-
-
-
-    

@@ -9,8 +9,6 @@ import psycopg2
 from util import *
 
 root = Tk()
-conn = None
-conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, USER, HOST, PASSWORD))
 
 class LoginWindow:
     
@@ -46,7 +44,7 @@ class LoginWindow:
 
 class CaseSelectionWindow:
     
-    def __init__(self):
+    def __init__(self, conn):
         self.window = Toplevel(root)
         self.window.protocol("WM_DELETE_WINDOW", root.quit)
         self.window.title("Lista spraw")
@@ -77,7 +75,7 @@ class CaseSelectionWindow:
         
 def main():    
     root.withdraw()
-    CaseSelectionWindow()
+    CaseSelectionWindow(psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, USER, HOST, PASSWORD)))
     root.mainloop()
 
 main()
