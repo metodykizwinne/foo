@@ -67,12 +67,14 @@ class CaseSelectionWindow:
             record_display = (case, owner, creation_date, closure_date if closure_date != None else "sprawa otwarta")
             self.ctree.insert('', 'end', values=record_display)
             
-        self.ctree.grid(column=0, row=0, rowspan=2, sticky=W)
+        self.ctree.grid(column=0, row=1, columnspan=2)
 
-        ttk.Button(self.window, text="Otwórz").grid(column=1, row=0, sticky=S)
-        ttk.Button(self.window, text="Utwórz nową sprawę", command=self.create_case).grid(column=1, row=1, sticky=N)
+        ttk.Button(self.window, text="Otwórz").grid(column=0, row=0, sticky=W)
+        ttk.Button(self.window, text="Utwórz nową sprawę", command=self.create_case).grid(column=1, row=0, sticky=W)
 
-        for child in self.window.winfo_children(): child.grid_configure(padx=5, pady=2)
+        for child in self.window.winfo_children(): child.grid_configure(padx=2, pady=2)
+
+        self.window.columnconfigure(1, weight=1)
         
         cur.close()
         conn.close()
