@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
 HOST='metodyki.dyndns.org'
+# HOST='localhost'
 DBNAME='pgdatabase'
+USER='pguser'
+PASSWORD='tylkosystemlinux'
 TESTDBNAME='test'
-TESTUSER='pguser'
-TESTPASSWORD='tylkosystemlinux'
+TESTUSER=USER
+TESTPASSWORD=PASSWORD
 
 import psycopg2
 
@@ -19,3 +22,7 @@ def insert_investigation(dbconn, record):
 def insert_user(dbconn, record):    
     cur = dbconn.cursor()
     cur.execute("INSERT INTO uzytkownicy (Policjant, Imie, Nazwisko) VALUES (%s, %s, %s)", record)
+
+
+
+    

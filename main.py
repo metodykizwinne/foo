@@ -6,15 +6,20 @@ import ttk
 import tkMessageBox
 import psycopg2
 
-from util import DBNAME, HOST
+from util import *
 
-class LoginDialog:
+root = Tk()
+conn = None
+conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, USER, HOST, PASSWORD))
+
+class LoginWindow:
     
-    def __init__(self, master):
-
-        master.title("Logowanie do systemu")
+    def __init__(self):
+        self.window = Toplevel(root)
+        self.window.protocol("WM_DELETE_WINDOW", root.quit)
+        self.window.title("Logowanie do systemu")
         
-        self.frame = ttk.Frame(master, padding="3 3 12 12")
+        self.frame = ttk.Frame(self.window, padding="3 3 12 12")
         self.frame.grid(column=0, row=0, sticky=(N, W, E, S))
 
         ttk.Label(self.frame, text="Login:").grid(column=1, row=1, sticky=E)
@@ -31,20 +36,48 @@ class LoginDialog:
         for child in self.frame.winfo_children(): child.grid_configure(padx=5, pady=5)
         
         self.login_entry.focus()
-        master.bind('<Return>', self.check_password)
+        self.window.bind('<Return>', self.check_password)
 
     def check_password(self, *args):
         try:
             conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, self.login.get(), HOST, self.password.get()))
         except:                 # host może też być nieosiągalny
             tkMessageBox.showinfo("Błąd logowania", "Złe hasło/login!")
+
+class CaseSelectionWindow:
+    
+    def __init__(self):
+        self.window = Toplevel(root)
+        self.window.protocol("WM_DELETE_WINDOW", root.quit)
+        self.window.title("Lista spraw")
+
+        columns = ('Nr sprawy', 'Właściciel', 'Data otwarcia', 'Data zamknięcia')
+        self.ctree = ttk.Treeview(self.window, columns=columns, show="headings")
+
+        for col in columns:
+            self.ctree.column(col, width=150)
+            self.ctree.heading(col, text=col)
+
+        cur = conn.cursor()
+        cur.execute("SELECT Sprawa, Policjant, Data_otwarcia, Data_zamkniecia FROM sprawy")
+
+        for (case, owner, creation_date, closure_date) in cur.fetchall():
+            record_display = (case, owner, creation_date, closure_date if closure_date != None else "sprawa otwarta")
+            self.ctree.insert('', 'end', values=record_display)
+            
+        self.ctree.grid(column=0, row=0, rowspan=2, sticky=W)
+
+        ttk.Button(self.window, text="Otwórz").grid(column=1, row=0, sticky=S)
+        ttk.Button(self.window, text="Utwórz nową sprawę").grid(column=1, row=1, sticky=N)
+
+        for child in self.window.winfo_children(): child.grid_configure(padx=5, pady=2)
+        
+        cur.close()
+        conn.close()
         
 def main():    
-    root = Tk()
     root.withdraw()
-    login_window = Toplevel(root)
-    login_window.protocol("WM_DELETE_WINDOW", root.quit)
-    LoginDialog(login_window)
+    CaseSelectionWindow()
     root.mainloop()
 
 main()

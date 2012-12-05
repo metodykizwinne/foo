@@ -24,7 +24,7 @@ class DBTestCase(unittest.TestCase):
     def tearDown(self):
         self.cur.execute( "DELETE FROM uprawnienia;" + \
                           "DELETE FROM sprawy;" + \
-                          "DELETE FROM uzytkownicy")
+                          "DELETE FROM uzytkownicy") # chyba nie jest to konieczne, jeśli nie zrobiło się conn.commit()
         self.cur.close()
         self.conn.close()
 
