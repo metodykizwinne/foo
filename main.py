@@ -71,7 +71,7 @@ class CaseSelectionWindow:
         
         for (case, owner, creation_date, closure_date) in is_owner + has_privileges:
             record_display = (case, owner, creation_date, closure_date if closure_date != None else "sprawa otwarta")
-            self.ctree.insert('', 'end', values=record_display)
+            self.ctree.insert('', '0', values=record_display)
             
         self.ctree.grid(column=0, row=1, columnspan=2)
 
