@@ -69,3 +69,12 @@ def close_case(dbconn, owner, case):
 def delete_case(dbconn, owner, case):
     cur = dbconn.cursor()
     cur.execute("DELETE FROM sprawy WHERE sprawa=%s AND policjant=%s",(case,owner))
+
+def cases_of_user(dbconn, user):
+    cur = dbconn.cursor()
+    cur.execute("SELECT Sprawa, Policjant, Data_otwarcia, Data_zamkniecia FROM sprawy WHERE Policjant=%s", (user,))
+    return cur.fetchall()
+
+def cases_user_can_access(dbconn, user):
+    return []
+    

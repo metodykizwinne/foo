@@ -64,18 +64,10 @@ class CaseSelectionWindow:
             self.ctree.column(col, width=150)
             self.ctree.heading(col, text=col)
 
-        cur = conn.cursor()
+        cases_to_list = core.cases_of_user(conn, user) + core.cases_user_can_access(conn, user)
         
-        # sprawy, których użytkownik jest właścicielem
-        cur.execute("SELECT Sprawa, Policjant, Data_otwarcia, Data_zamkniecia FROM sprawy WHERE Policjant=%s", (user,))
-        is_owner = cur.fetchall()
-
-        # sprawy, do których ma uprawnienia
-        has_privileges = []
-        
-        for (case, owner, creation_date, closure_date) in is_owner + has_privileges:
-            record_display = (case, owner, creation_date, closure_date if closure_date != None else "sprawa otwarta")
-            self.ctree.insert('', '0', values=record_display)
+        for list_entry in map(self.make_displayable, cases_to_list):
+            self.ctree.insert('', '0', values=list_entry)
             
         self.ctree.grid(column=0, row=1, columnspan=2)
 
@@ -86,7 +78,6 @@ class CaseSelectionWindow:
 
         self.window.columnconfigure(1, weight=1)
         
-        cur.close()
         conn.close()
 
     def create_case(self, *args):
@@ -95,6 +86,12 @@ class CaseSelectionWindow:
         core.create_case(self.conn, case, self.user)
 
         # tu wyskakuje okno edycji sprawy
+
+    # zamienia krotkę odpowiadającą sprawie na krotkę
+    # nadającą się do wyświetlenia
+    def make_displayable(self, case_info):
+        (case, owner, creation_date, closure_date) = case_info
+        return case_info if closure_date != None else (case, owner, creation_date, "sprawa otwarta")
         
 def main():    
     root.withdraw()
