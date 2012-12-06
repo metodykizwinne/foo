@@ -53,7 +53,7 @@ class CaseSelectionWindow:
         self.window.protocol("WM_DELETE_WINDOW", root.quit)
         self.window.title("Lista spraw")
 
-        columns = ('Nr sprawy', 'Właściciel', 'Data otwarcia', 'Data zamknięcia')
+        columns = ('Identyfikator sprawy', 'Właściciel', 'Data otwarcia', 'Data zamknięcia')
         self.ctree = ttk.Treeview(self.window, columns=columns, show="headings")
 
         for col in columns:
@@ -61,9 +61,15 @@ class CaseSelectionWindow:
             self.ctree.heading(col, text=col)
 
         cur = conn.cursor()
-        cur.execute("SELECT Sprawa, Policjant, Data_otwarcia, Data_zamkniecia FROM sprawy")
+        
+        # sprawy, których użytkownik jest właścicielem
+        cur.execute("SELECT Sprawa, Policjant, Data_otwarcia, Data_zamkniecia FROM sprawy WHERE Policjant=%s", (user,))
+        is_owner = cur.fetchall()
 
-        for (case, owner, creation_date, closure_date) in cur.fetchall():
+        # sprawy, do których ma uprawnienia
+        has_privileges = []
+        
+        for (case, owner, creation_date, closure_date) in is_owner + has_privileges:
             record_display = (case, owner, creation_date, closure_date if closure_date != None else "sprawa otwarta")
             self.ctree.insert('', 'end', values=record_display)
             
@@ -88,7 +94,7 @@ class CaseSelectionWindow:
         
 def main():    
     root.withdraw()
-    CaseSelectionWindow(psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, USER, HOST, PASSWORD)), 'P666')
+    CaseSelectionWindow(psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, USER, HOST, PASSWORD)), 'pguser')
     root.mainloop()
 
 main()
