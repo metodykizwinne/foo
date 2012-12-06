@@ -39,7 +39,11 @@ class LoginWindow:
 
     def check_password(self, *args):
         try:
-            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, self.login.get(), HOST, self.password.get()))
+            user = self.login.get()
+            password = self.password.get()
+            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, user, HOST, password))
+            self.window.destroy()
+            CaseSelectionWindow(conn, user)
         except:                 # host może też być nieosiągalny
             tkMessageBox.showinfo("Błąd logowania", "Złe hasło/login!")
 
@@ -94,6 +98,7 @@ class CaseSelectionWindow:
         
 def main():    
     root.withdraw()
+    # LoginWindow()
     CaseSelectionWindow(psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (DBNAME, USER, HOST, PASSWORD)), 'pguser')
     root.mainloop()
 
