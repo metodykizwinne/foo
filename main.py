@@ -62,8 +62,8 @@ class CaseSelectionWindow:
 
         for col in columns:
             self.ctree.column(col, width=150)
-            self.ctree.heading(col, text=col)
-
+            self.ctree.heading(col, text=col, command=lambda col=col: self.treeview_sort_column(col, False))
+ 
         cases_to_list = core.cases_of_user(conn, user) + core.cases_user_can_access(conn, user)
         
         for list_entry in map(self.make_displayable, cases_to_list):
@@ -79,6 +79,18 @@ class CaseSelectionWindow:
         self.window.columnconfigure(1, weight=1)
         
         conn.close()
+
+    def treeview_sort_column(self, col, reverse):
+        # znajdujemy odpowiednią kolejność wierszy
+        l = [(self.ctree.set(k, col), k) for k in self.ctree.get_children('')]
+        l.sort(reverse=reverse, key=lambda pair: pair[0])
+
+        # przestawiamy
+        for index, (val, k) in enumerate(l):
+            self.ctree.move(k, '', index)
+
+        # następnym razem sortujemy w odwrotnej kolejności
+        self.ctree.heading(col, command=lambda: self.treeview_sort_column(col, not reverse))
 
     def create_case(self, *args):
         # tu wyskakuje okno z pytaniem o zawartość pola Sprawa
